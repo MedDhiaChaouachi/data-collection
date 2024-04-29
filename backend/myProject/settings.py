@@ -56,6 +56,21 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # Your frontend URL
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+]
+
+CORS_ALLOW_HEADERS = [
+    'Content-Type',
+    'Authorization',
+]
 
 ROOT_URLCONF = 'myProject.urls'
 
@@ -84,7 +99,7 @@ WSGI_APPLICATION = 'myProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test2',
+        'NAME': 'test3',
         'USER':'Dhia',
         'PASSWORD': 'mD7889',
         'HOST': 'localhost',
@@ -95,7 +110,7 @@ DATABASES = {
 #email account: info.top10.1000@gmail.com
 #app password : pyux sxxj pgxy btst
 #pcadi
-EMAIL_BACAKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info.top10.1000@gmail.com'
@@ -144,6 +159,9 @@ STATICFILES_DIRS =[
 STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -179,3 +197,6 @@ DJOSER = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "crm.User"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

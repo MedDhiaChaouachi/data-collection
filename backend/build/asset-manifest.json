@@ -1,0 +1,11 @@
+{
+  "files": {
+    "main.js": "/static/js/main.576a0240.js",
+    "static/media/redux.cjs": "/static/media/redux.7edfc461ab353f1712ab.cjs",
+    "index.html": "/index.html",
+    "main.576a0240.js.map": "/static/js/main.576a0240.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.576a0240.js"
+  ]
+}

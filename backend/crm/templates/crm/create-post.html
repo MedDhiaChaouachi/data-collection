@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form id="postForm" enctype="multipart/form-data">
+    <input type="file" multiple>
+    <label>Title</label>
+    <input type="text" id="title" class="form-control">
+    <label>Description</label>
+    <textarea id="text" class="form-control"></textarea>
+    <label>Category</label>
+    <select id="category" class="form-control">
+        <option value="math">Math</option>
+        <option value="philosophy">Philosophy</option>
+        <option value="science">Science</option>
+        <option value="political">Political</option>
+        <option value="other">Other</option>
+    </select>
+    <label>Author</label>
+    <input type="text" id="author" class="form-control">
+    <button type="button" id="saveBtn" class="btn btn-primary mt-4">Save</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var files = [];
+        FilePond.registerPlugin(FilePondPluginFileValidateSize);
+        FilePond.registerPlugin(FilePondPluginFileValidateType);
+        FilePond.setOptions({
+            allowMultiple: true,
+            maxFiles: 5,
+            maxFileSize: '5MB'
+        });
+
+        const inputElement = document.querySelector('input[type="file"]');
+        const pond = FilePond.create(inputElement, {
+            acceptedFileTypes: ['image/png', 'image/jpeg'],
+            onaddfile: (err, fileItem) => {
+                if (!err) {
+                    files.push(fileItem.file);
+                }
+                console.log(files);
+            },
+            onremovefile: (err, fileItem) => {
+                const index = files.indexOf(fileItem.file);
+                if (index > -1) {
+                    files.splice(index, 1);
+                }
+                console.log(files);
+            }
+        });
+
+        $(document).on('click', '#saveBtn', function(e) {
+            var formData = new FormData($('#postForm')[0]);
+            formData.append('length', files.length);
+            for (var i = 0; i < files.length; i++) {
+                formData.append('images' + i, files[i]);
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "create-post" %}',
+                data: formData,
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function() {
+                    alert('The post has been created!');
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ":" + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -11,3 +11,6 @@ python manage.py startapp crm
 pip install -U djoser
 pip install -U djangorestframework_simplejwt
 #add "restframework and djoser " you can see djoser documentation https://djoser.readthedocs.io/en/latest/getting_started.html
+
+react :
+npm install --save axios react-router-dom redux redux-devtools-extension react-redux redux-thunk
