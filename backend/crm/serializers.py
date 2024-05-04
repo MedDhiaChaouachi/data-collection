@@ -1,7 +1,8 @@
 from djoser.serializers import UserCreateSerializer
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Post, PostImage
+from .models import Post
+
 
 
 
@@ -20,26 +21,33 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         return user
     
 
-class PostImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostImage
-        fields = ('id', 'post', 'image')
-
 class PostSerializer(serializers.ModelSerializer):
-    images = PostImageSerializer(many=True, read_only=True)
-    uploaded_images = serializers.ListField(
-        child = serializers.ImageField(max_length = 1000000, allow_empty_file = False, use_url = False),
-        write_only=True)
-    
     class Meta:
         model = Post
-        fields = ('id', 'title', 'text', 'category', 'author', 'created_at', 'images', "uploaded_images")
-    
+        fields = '__all__'
 
-    def create(self, validated_data):
-        uploaded_images = validated_data.pop("uploaded_images")
-        post = Post.objects.create(**validated_data)
-        for image in uploaded_images:
-            newpost_image = PostImage.objects.create(post=post, image=image)
-    
-        return post 
+class PostCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        exclude = ['created_at']  # Exclude 'created_at' field from user input
+
+class PostRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+
+class PostDeleteSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+    def validate_id(self, value):
+        try:
+            post = Post.objects.get(id=value)
+        except Post.DoesNotExist:
+            raise serializers.ValidationError("Post does not exist.")
+        return value
+
+class PostUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['title', 'text', 'category', 'author', 'image']

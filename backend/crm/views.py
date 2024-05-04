@@ -5,12 +5,17 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from .forms import CreateUserForm, LoginForm
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from .models import Post
+from .serializers import  PostCreateSerializer, PostRetrieveSerializer, PostDeleteSerializer,PostUpdateSerializer
 
 #, UploadForm
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view, permission_classes, action
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Post, PostImage
+from .models import Post
 
 # - Authentication models and functions 
 from django.contrib.auth.models import auth 
@@ -80,31 +85,48 @@ def user_logout(request):
 #  return redirect(homepage)
     #return render(request, 'crm/upload.html', {'form' : UploadForm })
 
-def post_view(request):
-    posts = Post.objects.all()
-    return render(request, 'post.html', {'posts':posts})
-
-def detail_view(request, id):
-    post = get_object_or_404(Post, id=id)
-    photos = PostImage.objects.filter(post=post)
-    return render(request, 'detail.html', {
-        'post':post,
-        'photos':photos
-    })
 
 @api_view(['POST'])
-class PostsViewSet(ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    parser_classes = (MultiPartParser, FormParser)
-    
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@permission_classes([AllowAny])
+def create_post(request):
+    serializer = PostCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_post(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = PostRetrieveSerializer(post)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+def update_post(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = PostUpdateSerializer(post, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_post(request, pk):
+    serializer = PostDeleteSerializer(data={'id': pk})
+    if serializer.is_valid():
+        post_id = serializer.validated_data['id']
+        Post.objects.filter(pk=post_id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -113,7 +135,7 @@ class PostsViewSet(ModelViewSet):
 @login_required(login_url="my-login")
 def dashboard(request):
 
-    return render(request, 'crm/dashboard.html',{'form' : form})
+    return render(request, 'crm/dashboard.html') 
 
 
 

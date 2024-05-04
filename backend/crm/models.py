@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from PIL import Image
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, name, password=None, **extra_fields):
@@ -81,7 +82,6 @@ class Analyst(User):
 
 
 
-
 class Post(models.Model):
     CATEGORY_CHOICES = [
         ('math', 'Math'),
@@ -95,16 +95,27 @@ class Post(models.Model):
     text = models.TextField(blank=False)  # Required field
     category = models.CharField(max_length=25, choices=CATEGORY_CHOICES, blank=False)  # Required field
     author = models.CharField(max_length=100)  # You can adjust the max length as needed
+    image = models.ImageField(upload_to='djangoposts/files/images', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically set to the current date and time when created
     
     def __str__(self):
         return self.title
-
-
-
-class PostImage(models.Model):
-    post = models.ForeignKey(Post, default=None ,on_delete=models.CASCADE, related_name = "images")
-    image = models.ImageField(upload_to='djangoposts/files/images', default="", null=True, blank=True)
     
-    def __str__(self):
-        return self.post.title
+    def clean(self):
+        if self.image:
+            try:
+                img = Image.open(self.image)
+                if img.format not in ['JPEG', 'PNG', 'GIF']:
+                    raise ValidationError("Only JPEG, PNG, and GIF formats are supported.")
+            except:
+                raise ValidationError("Invalid image file.")
+            
+
+
+
+#class PostImage(models.Model):
+ #   post = models.ForeignKey(Post, default=None ,on_delete=models.CASCADE, related_name = "images")
+  #  image = models.ImageField(upload_to='djangoposts/files/images', default="", null=True, blank=True)
+   # 
+    #def __str__(self):
+     #   return self.post.title

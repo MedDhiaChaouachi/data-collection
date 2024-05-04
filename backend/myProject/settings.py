@@ -47,19 +47,21 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    #'crm.middleware.open_access_middleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # Your frontend URL
-]
+    'corsheaders.middleware.CorsMiddleware',
+]# In your Django settings.py
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*']
+CORS_ORIGIN_WHITELIST = ('http://localhost:5000',)
 CORS_ALLOW_METHODS = [
     'GET',
     'POST',
@@ -67,10 +69,10 @@ CORS_ALLOW_METHODS = [
     'DELETE',
 ]
 
-CORS_ALLOW_HEADERS = [
-    'Content-Type',
-    'Authorization',
-]
+#CORS_ALLOW_HEADERS = [
+ #   'Content-Type',
+  #  'Authorization',
+#]
 
 ROOT_URLCONF = 'myProject.urls'
 
@@ -99,7 +101,7 @@ WSGI_APPLICATION = 'myProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test3',
+        'NAME': 'test5',
         'USER':'Dhia',
         'PASSWORD': 'mD7889',
         'HOST': 'localhost',

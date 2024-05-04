@@ -8,7 +8,7 @@ urlpatterns = [
     path('', views.homepage, name=""),
 
     # path("products", views.ApiProducts.as_view()),
-    path('create_post', views.PostsViewSet, name='create-post'),
+    
 
     path('register', views.register, name="register"),
 
@@ -17,6 +17,14 @@ urlpatterns = [
     path('dashboard', views.dashboard, name="dashboard"),
     
     path('user-logout', views.user_logout, name="user-logout"),
+
+    path('posts/', views.create_post, name='create_post'),
+
+    path('posts/<int:pk>/', views.get_post, name='get_post'),  
+    
+    path('posts/<int:pk>/update/', views.update_post, name='update_post'),
+    
+    path('posts/<int:pk>/delete/', views.delete_post, name='delete_post'),
 
     
     #-*=-09876 1path('create-post/', views.create_post_view, name='create-post'),
