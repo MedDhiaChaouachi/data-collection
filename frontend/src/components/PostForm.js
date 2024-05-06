@@ -1,89 +1,88 @@
 import React, { useState } from "react";
 import "../css/styles.css"; // Import the CSS file
+import axios from "axios";
 
 function CreatePost() {
-  const [title, setTitle] = useState("");
-  const [text, setText] = useState("");
-  const [category, setCategory] = useState("");
-  const [author, setAuthor] = useState("");
-  const [images, setImages] = useState([]);
+  const [formData, setFormData] = useState({
+    title: "",
+    text: "",
+    category: "",
+    image: null,
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Form data to be sent to the server
-    const formData = {
-      title,
-      text,
-      category,
-      author,
-      images,
-    };
-
-    // Send form data to the server
-    try {
-      const response = await fetch("/create_post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        console.log("Post created successfully");
-        // Reset form fields
-        setTitle("");
-        setText("");
-        setCategory("");
-        setAuthor("");
-        setImages([]);
-      } else {
-        console.error("Failed to create post");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e) => {
-    const files = e.target.files;
-    setImages(files);
+    setFormData({ ...formData, image: e.target.files[0] });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve accessToken from local storage
+    if (!accessToken) {
+      console.error("Access token is missing.");
+      return;
+    }
+
+    const postData = new FormData();
+    postData.append("title", formData.title);
+    postData.append("text", formData.text);
+    postData.append("category", formData.category);
+    postData.append("image", formData.image);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/create_post",
+        postData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Include authentication token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data);
+      // Handle success
+    } catch (error) {
+      console.error("Error creating post:", error);
+      // Handle error
+    }
   };
 
   return (
-    <div className="post-form-container">
-      <h1>Create a New Post</h1>
-      <h6 className="instruction">
-        Fill out the form below to publish a new post.
-      </h6>
-      <form className="post-form" onSubmit={handleSubmit}>
+    <div>
+      <h1>Create Post</h1>
+      <form onSubmit={handleSubmit}>
         <div>
           <label>Title:</label>
           <input
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter a title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
           />
         </div>
-
         <div>
           <label>Text:</label>
           <textarea
-            className="textareaa"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Write your post content"
-          ></textarea>
+            name="text"
+            value={formData.text}
+            onChange={handleChange}
+            required
+          />
         </div>
-
         <div>
           <label>Category:</label>
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
           >
+            <option value="">Select category</option>
             <option value="math">Math</option>
             <option value="philosophy">Philosophy</option>
             <option value="science">Science</option>
@@ -91,23 +90,16 @@ function CreatePost() {
             <option value="other">Other</option>
           </select>
         </div>
-
         <div>
-          <label>Author:</label>
+          <label>Image:</label>
           <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Enter the author's name"
+            type="file"
+            name="image"
+            onChange={handleImageChange}
+            accept="image/*"
           />
         </div>
-
-        <div>
-          <label>Images:</label>
-          <input type="file" multiple onChange={handleImageChange} />
-        </div>
-
-        <button type="submit">Publish Post</button>
+        <button type="submit">Create Post</button>
       </form>
     </div>
   );

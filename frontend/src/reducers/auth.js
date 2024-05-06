@@ -37,6 +37,8 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
       };
     case LOGIN_SUCCESS:
+      localStorage.setItem("accessToken", payload.access);
+      localStorage.setItem("refreshToken", payload.refresh);
     case GOOGLE_AUTH_SUCCESS:
     case FACEBOOK_AUTH_SUCCESS:
       localStorage.setItem("access", payload.access);
@@ -74,6 +76,8 @@ export default function (state = initialState, action) {
     case LOGOUT:
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       return {
         ...state,
         access: null,

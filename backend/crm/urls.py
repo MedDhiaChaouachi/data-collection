@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static 
 from . import views
 from rest_framework.routers import DefaultRouter
+from .views import PostCreateAPIView
 
 urlpatterns = [ 
     path('', views.homepage, name=""),
@@ -17,8 +18,10 @@ urlpatterns = [
     path('dashboard', views.dashboard, name="dashboard"),
     
     path('user-logout', views.user_logout, name="user-logout"),
+    
+    path('create_post', PostCreateAPIView.as_view(), name='create_post'),
 
-    path('posts/', views.create_post, name='create_post'),
+    #path('posts/', views.create_post, name='create_post'),
 
     path('posts/<int:pk>/', views.get_post, name='get_post'),  
     

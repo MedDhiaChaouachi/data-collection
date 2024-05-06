@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import PermissionsMixin , AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import User, PermissionsMixin , AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -94,7 +94,7 @@ class Post(models.Model):
     title = models.CharField(max_length=250, blank=False)  # Required field
     text = models.TextField(blank=False)  # Required field
     category = models.CharField(max_length=25, choices=CATEGORY_CHOICES, blank=False)  # Required field
-    author = models.CharField(max_length=100)  # You can adjust the max length as needed
+    author = models.ForeignKey(User, on_delete=models.CASCADE)  # Foreign key to User model
     image = models.ImageField(upload_to='djangoposts/files/images', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically set to the current date and time when created
     
@@ -109,7 +109,6 @@ class Post(models.Model):
                     raise ValidationError("Only JPEG, PNG, and GIF formats are supported.")
             except:
                 raise ValidationError("Invalid image file.")
-            
 
 
 

@@ -21,33 +21,9 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         return user
     
 
+
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
-
-class PostCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        exclude = ['created_at']  # Exclude 'created_at' field from user input
-
-class PostRetrieveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = '__all__'
-
-
-class PostDeleteSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-
-    def validate_id(self, value):
-        try:
-            post = Post.objects.get(id=value)
-        except Post.DoesNotExist:
-            raise serializers.ValidationError("Post does not exist.")
-        return value
-
-class PostUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['title', 'text', 'category', 'author', 'image']
+        fields = ['id', 'title', 'text', 'category', 'author', 'image', 'created_at']
+        read_only_fields = ['author', 'created_at']
