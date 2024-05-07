@@ -94,42 +94,6 @@ class PostCreateAPIView(generics.CreateAPIView):
         serializer.save(author=self.request.user)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_post(request, pk):
-    try:
-        post = Post.objects.get(pk=pk)
-    except Post.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = PostRetrieveSerializer(post)
-    return Response(serializer.data)
-
-@api_view(['PUT'])
-def update_post(request, pk):
-    try:
-        post = Post.objects.get(pk=pk)
-    except Post.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = PostUpdateSerializer(post, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['DELETE'])
-def delete_post(request, pk):
-    serializer = PostDeleteSerializer(data={'id': pk})
-    if serializer.is_valid():
-        post_id = serializer.validated_data['id']
-        Post.objects.filter(pk=post_id).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
 
 @login_required(login_url="my-login")
 def dashboard(request):
